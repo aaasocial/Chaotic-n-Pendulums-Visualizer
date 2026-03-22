@@ -1,0 +1,762 @@
+<div style="padding: 1rem 0;">
+  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin-bottom: 1rem;">
+    <div>
+      <label style="font-size: 13px; color: var(--color-text-secondary); display: block; margin-bottom: 4px;">Pendulums (n)</label>
+      <input type="range" min="2" max="20" value="4" step="1" id="sl-n" style="width: 100%;" />
+      <span style="font-size: 13px; font-weight: 500;" id="out-n">4</span>
+    </div>
+    <div>
+      <label style="font-size: 13px; color: var(--color-text-secondary); display: block; margin-bottom: 4px;">Initial angle (deg)</label>
+      <input type="range" min="10" max="170" value="90" step="1" id="sl-angle" style="width: 100%;" />
+      <span style="font-size: 13px; font-weight: 500;" id="out-angle">90°</span>
+    </div>
+    <div>
+      <label style="font-size: 13px; color: var(--color-text-secondary); display: block; margin-bottom: 4px;">Sim time (s)</label>
+      <input type="range" min="2" max="600" value="8" step="1" id="sl-time" style="width: 100%;" />
+      <span style="font-size: 13px; font-weight: 500;" id="out-time">8s</span>
+    </div>
+    <div>
+      <label style="font-size: 13px; color: var(--color-text-secondary); display: block; margin-bottom: 4px;">dt</label>
+      <input type="range" min="1" max="4" value="2" step="1" id="sl-dt" style="width: 100%;" />
+      <span style="font-size: 13px; font-weight: 500;" id="out-dt">0.005</span>
+    </div>
+    <div>
+      <label style="font-size: 13px; color: var(--color-text-secondary); display: block; margin-bottom: 4px;">Damping γ</label>
+      <input type="range" min="0" max="25" value="0" step="1" id="sl-gamma" style="width: 100%;" />
+      <span style="font-size: 13px; font-weight: 500;" id="out-gamma">0</span>
+    </div>
+    <div>
+      <label style="font-size: 13px; color: var(--color-text-secondary); display: block; margin-bottom: 4px;">Drive mode</label>
+      <select id="sel-drive-mode" style="width: 100%; height: 36px; border: 0.5px solid var(--color-border-secondary); border-radius: var(--border-radius-md); padding: 0 8px; background: var(--color-background-primary); color: var(--color-text-primary);">
+        <option value="none">None</option>
+        <option value="uniform">Uniform torque</option>
+        <option value="pivot-h">Horizontal pivot shaking</option>
+        <option value="pivot-v">Vertical pivot shaking</option>
+      </select>
+    </div>
+    <div>
+      <label style="font-size: 13px; color: var(--color-text-secondary); display: block; margin-bottom: 4px;">Drive amplitude A</label>
+      <input type="range" min="0" max="100" value="0" step="1" id="sl-drive-a" style="width: 100%;" />
+      <span style="font-size: 13px; font-weight: 500;" id="out-drive-a">0</span>
+    </div>
+    <div>
+      <label style="font-size: 13px; color: var(--color-text-secondary); display: block; margin-bottom: 4px;">Drive frequency ω</label>
+      <input type="range" min="1" max="100" value="20" step="1" id="sl-drive-w" style="width: 100%;" />
+      <span style="font-size: 13px; font-weight: 500;" id="out-drive-w">2.0</span>
+    </div>
+    <div>
+      <label style="font-size: 13px; color: var(--color-text-secondary); display: block; margin-bottom: 4px;">X axis</label>
+      <select id="sel-x" style="width: 100%; height: 36px; border: 0.5px solid var(--color-border-secondary); border-radius: var(--border-radius-md); padding: 0 8px; background: var(--color-background-primary); color: var(--color-text-primary);"></select>
+    </div>
+    <div>
+      <label style="font-size: 13px; color: var(--color-text-secondary); display: block; margin-bottom: 4px;">Y axis</label>
+      <select id="sel-y" style="width: 100%; height: 36px; border: 0.5px solid var(--color-border-secondary); border-radius: var(--border-radius-md); padding: 0 8px; background: var(--color-background-primary); color: var(--color-text-primary);"></select>
+    </div>
+    <div>
+      <label style="font-size: 13px; color: var(--color-text-secondary); display: block; margin-bottom: 4px;">Z axis</label>
+      <select id="sel-z" style="width: 100%; height: 36px; border: 0.5px solid var(--color-border-secondary); border-radius: var(--border-radius-md); padding: 0 8px; background: var(--color-background-primary); color: var(--color-text-primary);"></select>
+    </div>
+    <div>
+      <label style="font-size: 13px; color: var(--color-text-secondary); display: block; margin-bottom: 4px;">Plot mode</label>
+      <select id="sel-mode" style="width: 100%; height: 36px; border: 0.5px solid var(--color-border-secondary); border-radius: var(--border-radius-md); padding: 0 8px; background: var(--color-background-primary); color: var(--color-text-primary);">
+        <option value="lines">Lines</option>
+        <option value="markers">Points</option>
+      </select>
+    </div>
+    <div>
+      <label style="font-size: 13px; color: var(--color-text-secondary); display: block; margin-bottom: 4px;">Color</label>
+      <select id="sel-color" style="width: 100%; height: 36px; border: 0.5px solid var(--color-border-secondary); border-radius: var(--border-radius-md); padding: 0 8px; background: var(--color-background-primary); color: var(--color-text-primary);">
+        <option value="time">By time (Viridis)</option>
+        <option value="blue">Solid blue</option>
+        <option value="orange">Solid orange</option>
+        <option value="white">Solid white</option>
+        <option value="red">Solid red</option>
+        <option value="green">Solid green</option>
+        <option value="purple">Solid purple</option>
+      </select>
+    </div>
+  </div>
+  <div style="display: flex; gap: 8px; margin-bottom: 1rem; flex-wrap: wrap;">
+    <button id="btn-run">Run simulation</button>
+    <button id="btn-chaos">Analyze chaos</button>
+  </div>
+  <div style="font-size: 13px; color: var(--color-text-secondary); margin-bottom: 8px;" id="status"></div>
+  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 12px; margin-bottom: 12px;">
+    <div style="background: var(--color-background-secondary); border-radius: var(--border-radius-md); padding: 0.75rem 1rem;">
+      <div style="font-size: 12px; color: var(--color-text-secondary);">Energy drift</div>
+      <div style="font-size: 18px; font-weight: 500;" id="energy-drift">—</div>
+    </div>
+    <div style="background: var(--color-background-secondary); border-radius: var(--border-radius-md); padding: 0.75rem 1rem;">
+      <div style="font-size: 12px; color: var(--color-text-secondary);">Steps</div>
+      <div style="font-size: 18px; font-weight: 500;" id="steps-count">—</div>
+    </div>
+    <div style="background: var(--color-background-secondary); border-radius: var(--border-radius-md); padding: 0.75rem 1rem;">
+      <div style="font-size: 12px; color: var(--color-text-secondary);">Max Lyapunov λ</div>
+      <div style="font-size: 18px; font-weight: 500;" id="lyap-val">—</div>
+    </div>
+    <div style="background: var(--color-background-secondary); border-radius: var(--border-radius-md); padding: 0.75rem 1rem;">
+      <div style="font-size: 12px; color: var(--color-text-secondary);">Corr. dimension</div>
+      <div style="font-size: 18px; font-weight: 500;" id="corr-dim">—</div>
+    </div>
+    <div style="background: var(--color-background-secondary); border-radius: var(--border-radius-md); padding: 0.75rem 1rem;">
+      <div style="font-size: 12px; color: var(--color-text-secondary);">Verdict</div>
+      <div style="font-size: 18px; font-weight: 500;" id="verdict">—</div>
+    </div>
+  </div>
+  <details style="margin-bottom: 12px; border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 0;">
+    <summary style="padding: 0.75rem 1rem; cursor: pointer; font-size: 14px; font-weight: 500; color: var(--color-text-primary);">How to interpret results</summary>
+    <div style="padding: 0 1rem 1rem; font-size: 13px; color: var(--color-text-secondary); line-height: 1.7;">
+      <div style="margin-bottom: 12px;">
+        <span style="font-weight: 500; color: var(--color-text-primary);">Verdict logic</span>
+        <div style="display: grid; grid-template-columns: auto auto auto; gap: 0; margin-top: 8px; border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-md); overflow: hidden;">
+          <div style="padding: 8px 12px; font-weight: 500; background: var(--color-background-secondary); border-bottom: 0.5px solid var(--color-border-tertiary);">Lyapunov λ &gt; 0.1</div>
+          <div style="padding: 8px 12px; font-weight: 500; background: var(--color-background-secondary); border-bottom: 0.5px solid var(--color-border-tertiary); border-left: 0.5px solid var(--color-border-tertiary);">Non-integer dimension</div>
+          <div style="padding: 8px 12px; font-weight: 500; background: var(--color-background-secondary); border-bottom: 0.5px solid var(--color-border-tertiary); border-left: 0.5px solid var(--color-border-tertiary);">Verdict</div>
+          <div style="padding: 8px 12px; border-bottom: 0.5px solid var(--color-border-tertiary);">Yes</div>
+          <div style="padding: 8px 12px; border-bottom: 0.5px solid var(--color-border-tertiary); border-left: 0.5px solid var(--color-border-tertiary);">Yes</div>
+          <div style="padding: 8px 12px; border-bottom: 0.5px solid var(--color-border-tertiary); border-left: 0.5px solid var(--color-border-tertiary); font-weight: 500;">Strange attractor</div>
+          <div style="padding: 8px 12px; border-bottom: 0.5px solid var(--color-border-tertiary);">Yes</div>
+          <div style="padding: 8px 12px; border-bottom: 0.5px solid var(--color-border-tertiary); border-left: 0.5px solid var(--color-border-tertiary);">No / unclear</div>
+          <div style="padding: 8px 12px; border-bottom: 0.5px solid var(--color-border-tertiary); border-left: 0.5px solid var(--color-border-tertiary); font-weight: 500;">Chaotic</div>
+          <div style="padding: 8px 12px; border-bottom: 0.5px solid var(--color-border-tertiary);">No</div>
+          <div style="padding: 8px 12px; border-bottom: 0.5px solid var(--color-border-tertiary); border-left: 0.5px solid var(--color-border-tertiary);">Yes</div>
+          <div style="padding: 8px 12px; border-bottom: 0.5px solid var(--color-border-tertiary); border-left: 0.5px solid var(--color-border-tertiary); font-weight: 500;">Fractal, not chaotic</div>
+          <div style="padding: 8px 12px;">No</div>
+          <div style="padding: 8px 12px; border-left: 0.5px solid var(--color-border-tertiary);">No</div>
+          <div style="padding: 8px 12px; border-left: 0.5px solid var(--color-border-tertiary); font-weight: 500;">Not chaotic</div>
+        </div>
+      </div>
+      <div style="margin-bottom: 8px;">
+        <span style="font-weight: 500; color: var(--color-text-primary);">Max Lyapunov λ</span> — measures exponential divergence of nearby trajectories. A positive value means tiny differences in initial conditions grow exponentially over time, the hallmark of chaos. Values near zero or negative indicate regular (non-chaotic) motion. Estimated by rerunning the simulation with a 10⁻⁷ perturbation and fitting the log-separation slope.
+      </div>
+      <div style="margin-bottom: 8px;">
+        <span style="font-weight: 500; color: var(--color-text-primary);">Correlation dimension</span> — estimates the fractal dimension of the attractor. Integer values (1 = limit cycle, 2 = torus) indicate regular motion. Non-integer values (e.g. 1.3 or 2.06) indicate fractal, self-similar structure — a strange attractor. Computed via the Grassberger-Procaccia algorithm on the (θ, P, L) trajectory.
+      </div>
+      <div style="margin-bottom: 8px;">
+        <span style="font-weight: 500; color: var(--color-text-primary);">Energy drift</span> — the Hamiltonian (T + V) should be conserved. Large drift indicates numerical error from the integrator. Reduce dt or simulation time if drift is large. Values below 10⁻² are generally acceptable.
+      </div>
+      <div>
+        <span style="font-weight: 500; color: var(--color-text-primary);">Note on projections</span> — this plots a 3D slice of a 2n-dimensional phase space. Use the axis selectors to choose which variables to plot. Try combinations like (θᵢ, Pᵢ, θⱼ) or (θᵢ, Pᵢ, Pⱼ) for different pendulums to reveal attractor structure that the Lagrangian view might hide.
+      </div>
+    </div>
+  </details>
+  <details style="margin-bottom: 12px; border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 0;">
+    <summary style="padding: 0.75rem 1rem; cursor: pointer; font-size: 14px; font-weight: 500; color: var(--color-text-primary);">Suggested axis combinations</summary>
+    <div style="padding: 0 1rem 1rem; font-size: 13px; color: var(--color-text-secondary); line-height: 1.7;">
+      <div style="display: grid; grid-template-columns: auto 1fr auto; gap: 0; margin-top: 8px; border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-md); overflow: hidden;">
+        <div style="padding: 8px 12px; font-weight: 500; background: var(--color-background-secondary); border-bottom: 0.5px solid var(--color-border-tertiary);">Axes (X, Y, Z)</div>
+        <div style="padding: 8px 12px; font-weight: 500; background: var(--color-background-secondary); border-bottom: 0.5px solid var(--color-border-tertiary); border-left: 0.5px solid var(--color-border-tertiary);">What it reveals</div>
+        <div style="padding: 8px 12px; font-weight: 500; background: var(--color-background-secondary); border-bottom: 0.5px solid var(--color-border-tertiary); border-left: 0.5px solid var(--color-border-tertiary);">Apply</div>
+        <div style="padding: 8px 12px; border-bottom: 0.5px solid var(--color-border-tertiary);">θ₁, P₁, L</div>
+        <div style="padding: 8px 12px; border-bottom: 0.5px solid var(--color-border-tertiary); border-left: 0.5px solid var(--color-border-tertiary);">Phase space of pendulum 1 plus Lagrangian — the standard view for seeing how one pendulum's state relates to the system's energy.</div>
+        <div style="padding: 8px 12px; border-bottom: 0.5px solid var(--color-border-tertiary); border-left: 0.5px solid var(--color-border-tertiary);"><button onclick="applyAxes('thet-0','P-0','L')">Set</button></div>
+        <div style="padding: 8px 12px; border-bottom: 0.5px solid var(--color-border-tertiary);">θ₁, P₁, θ₂</div>
+        <div style="padding: 8px 12px; border-bottom: 0.5px solid var(--color-border-tertiary); border-left: 0.5px solid var(--color-border-tertiary);">Cross-coupling between two pendulums. Often shows clear folding structure because the angle of a neighboring pendulum adds an independent degree of freedom.</div>
+        <div style="padding: 8px 12px; border-bottom: 0.5px solid var(--color-border-tertiary); border-left: 0.5px solid var(--color-border-tertiary);"><button onclick="applyAxes('thet-0','P-0','thet-1')">Set</button></div>
+        <div style="padding: 8px 12px; border-bottom: 0.5px solid var(--color-border-tertiary);">θ₁, θ₂, θ₃</div>
+        <div style="padding: 8px 12px; border-bottom: 0.5px solid var(--color-border-tertiary); border-left: 0.5px solid var(--color-border-tertiary);">Angle space only — good for seeing how pendulums correlate. Regular motion shows smooth curves; chaos fills a volume.</div>
+        <div style="padding: 8px 12px; border-bottom: 0.5px solid var(--color-border-tertiary); border-left: 0.5px solid var(--color-border-tertiary);"><button onclick="applyAxes('thet-0','thet-1','thet-2')">Set</button></div>
+        <div style="padding: 8px 12px; border-bottom: 0.5px solid var(--color-border-tertiary);">P₁, P₂, P₃</div>
+        <div style="padding: 8px 12px; border-bottom: 0.5px solid var(--color-border-tertiary); border-left: 0.5px solid var(--color-border-tertiary);">Momentum space — can reveal different attractor structure than angle space since momentum carries velocity information.</div>
+        <div style="padding: 8px 12px; border-bottom: 0.5px solid var(--color-border-tertiary); border-left: 0.5px solid var(--color-border-tertiary);"><button onclick="applyAxes('P-0','P-1','P-2')">Set</button></div>
+        <div style="padding: 8px 12px;">θ₁, P₂, θ₃</div>
+        <div style="padding: 8px 12px; border-left: 0.5px solid var(--color-border-tertiary);">Mixed cross-pendulum view — sometimes the best for fractal layering because it samples from three different pendulums' phase spaces.</div>
+        <div style="padding: 8px 12px; border-left: 0.5px solid var(--color-border-tertiary);"><button onclick="applyAxes('thet-0','P-1','thet-2')">Set</button></div>
+      </div>
+    </div>
+  </details>
+  <div id="suggestions-box" style="display: none; margin-bottom: 12px; border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 1rem;">
+    <div style="font-size: 14px; font-weight: 500; margin-bottom: 8px; color: var(--color-text-primary);">Suggested projections</div>
+    <div style="font-size: 13px; color: var(--color-text-secondary); margin-bottom: 10px;">Ranked by how clearly the fractal structure is visible (non-integer correlation dimension).</div>
+    <div id="suggestions-list"></div>
+  </div>
+  <div id="plot3d" style="width: 100%; height: 500px;"></div>
+  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 12px;">
+    <div id="plot-lyap" style="width: 100%; height: 280px;"></div>
+    <div id="plot-corr" style="width: 100%; height: 280px;"></div>
+  </div>
+  <div style="margin-top: 12px;">
+    <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 8px;">
+      <button id="btn-play" style="min-width: 70px;">Play</button>
+      <button id="btn-reset" style="min-width: 70px;">Reset</button>
+      <label style="font-size: 13px; color: var(--color-text-secondary);">Speed</label>
+      <input type="range" min="1" max="10" value="5" step="1" id="sl-speed" style="flex: 0 0 120px;" />
+      <span style="font-size: 13px; font-weight: 500; min-width: 30px;" id="out-speed">1x</span>
+    </div>
+    <div style="display: flex; align-items: center; gap: 8px;">
+      <label style="font-size: 13px; color: var(--color-text-secondary); white-space: nowrap;">Time progress</label>
+      <input type="range" min="0" max="1000" value="1000" step="1" id="sl-progress" style="flex: 1;" />
+      <span style="font-size: 13px; font-weight: 500; min-width: 45px;" id="out-progress">100.0%</span>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/plotly.js-dist-min@2.35.0/plotly.min.js"></script>
+<script>
+const dtMap = {1: 0.01, 2: 0.005, 3: 0.002, 4: 0.001};
+const COLORS = ['#7F77DD','#1D9E75','#D85A30','#378ADD','#D4537E','#639922','#BA7517','#E24B4A'];
+const GR = 9.8, MA = 1, LE = 1;
+let simData = null;
+function $(id) { return document.getElementById(id); }
+function wireSlider(id, outId, fmt) {
+  const sl = $(id);
+  sl.addEventListener('input', () => $(outId).textContent = fmt(sl.value));
+}
+wireSlider('sl-n', 'out-n', v => v);
+wireSlider('sl-angle', 'out-angle', v => v + '°');
+wireSlider('sl-time', 'out-time', v => v >= 60 ? Math.floor(v/60) + 'm' + (v%60 ? v%60 + 's' : '') : v + 's');
+wireSlider('sl-dt', 'out-dt', v => dtMap[v]);
+wireSlider('sl-gamma', 'out-gamma', v => (v * 0.1).toFixed(1));
+wireSlider('sl-drive-a', 'out-drive-a', v => (v * 0.5).toFixed(1));
+wireSlider('sl-drive-w', 'out-drive-w', v => (v * 0.1).toFixed(1));
+const speedMap = {1:0.05, 2:0.1, 3:0.2, 4:0.5, 5:1, 6:2, 7:4, 8:8, 9:16, 10:32};
+const speedLabels = {1:'0.05x', 2:'0.1x', 3:'0.2x', 4:'0.5x', 5:'1x', 6:'2x', 7:'4x', 8:'8x', 9:'16x', 10:'32x'};
+let playing = false;
+let animFrame = null;
+let lastFrameTime = 0;
+
+$('sl-progress').addEventListener('input', () => {
+  const val = (parseInt($('sl-progress').value) / 10).toFixed(1);
+  $('out-progress').textContent = val + '%';
+  if (simData) renderPlot();
+});
+$('sl-speed').addEventListener('input', () => {
+  $('out-speed').textContent = speedLabels[parseInt($('sl-speed').value)];
+});
+
+function startPlay() {
+  if (!simData) return;
+  if (parseInt($('sl-progress').value) >= 1000) $('sl-progress').value = 0;
+  playing = true;
+  $('btn-play').textContent = 'Pause';
+  lastFrameTime = performance.now();
+  animFrame = requestAnimationFrame(animTick);
+}
+function stopPlay() {
+  playing = false;
+  $('btn-play').textContent = 'Play';
+  if (animFrame) { cancelAnimationFrame(animFrame); animFrame = null; }
+}
+function animTick(now) {
+  if (!playing || !simData) return;
+  const dt = (now - lastFrameTime) / 1000;
+  lastFrameTime = now;
+  const speed = speedMap[parseInt($('sl-speed').value)];
+  const totalSecs = simData.totalTime;
+  const increment = (dt * speed / totalSecs) * 1000;
+  let current = parseFloat($('sl-progress').value) + increment;
+  if (current >= 1000) {
+    current = 1000;
+    stopPlay();
+  }
+  $('sl-progress').value = current;
+  $('out-progress').textContent = (current / 10).toFixed(1) + '%';
+  renderPlot();
+  if (playing) animFrame = requestAnimationFrame(animTick);
+}
+$('btn-play').addEventListener('click', () => {
+  if (playing) stopPlay(); else startPlay();
+});
+$('btn-reset').addEventListener('click', () => {
+  stopPlay();
+  $('sl-progress').value = 0;
+  $('out-progress').textContent = '0.0%';
+  if (simData) renderPlot();
+});
+$('sl-n').addEventListener('input', updateAxisSelectors);
+updateAxisSelectors();
+function updateAxisSelectors() {
+  const n = parseInt($('sl-n').value);
+  const selectors = ['sel-x', 'sel-y', 'sel-z'];
+  const defaults = ['thet-0', 'P-0', 'L'];
+  selectors.forEach((sid, si) => {
+    const sel = $(sid);
+    const prev = sel.value || defaults[si];
+    sel.innerHTML = '';
+    const oL = document.createElement('option');
+    oL.value = 'L'; oL.textContent = 'Lagrangian';
+    sel.appendChild(oL);
+    for (let i = 0; i < n; i++) {
+      const oT = document.createElement('option');
+      oT.value = 'thet-' + i; oT.textContent = 'θ' + (i + 1);
+      sel.appendChild(oT);
+    }
+    for (let i = 0; i < n; i++) {
+      const oP = document.createElement('option');
+      oP.value = 'P-' + i; oP.textContent = 'P' + (i + 1);
+      sel.appendChild(oP);
+    }
+    if ([...sel.options].some(o => o.value === prev)) sel.value = prev;
+    else sel.value = defaults[si];
+  });
+}
+$('sel-x').addEventListener('change', () => { if (simData) renderPlot(); });
+$('sel-y').addEventListener('change', () => { if (simData) renderPlot(); });
+$('sel-z').addEventListener('change', () => { if (simData) renderPlot(); });
+$('sel-mode').addEventListener('change', () => { if (simData) renderPlot(); });
+$('sel-color').addEventListener('change', () => { if (simData) renderPlot(); });
+function applyAxes(x, y, z) {
+  const n = parseInt($('sl-n').value);
+  function valid(key) {
+    if (key === 'L') return true;
+    const parts = key.split('-');
+    return parseInt(parts[1]) < n;
+  }
+  if (!valid(x) || !valid(y) || !valid(z)) {
+    $('status').textContent = 'Not enough pendulums for this combination — increase n';
+    return;
+  }
+  $('sel-x').value = x; $('sel-y').value = y; $('sel-z').value = z;
+  if (simData) renderPlot();
+}
+function invertMatrix(A, n) {
+  const aug = [];
+  for (let i = 0; i < n; i++) {
+    aug[i] = new Float64Array(2 * n);
+    for (let j = 0; j < n; j++) aug[i][j] = A[i * n + j];
+    aug[i][n + i] = 1;
+  }
+  for (let col = 0; col < n; col++) {
+    let maxRow = col, maxVal = Math.abs(aug[col][col]);
+    for (let r = col + 1; r < n; r++) {
+      const v = Math.abs(aug[r][col]);
+      if (v > maxVal) { maxVal = v; maxRow = r; }
+    }
+    if (maxRow !== col) { const tmp = aug[col]; aug[col] = aug[maxRow]; aug[maxRow] = tmp; }
+    const piv = aug[col][col];
+    if (Math.abs(piv) < 1e-14) return null;
+    for (let j = 0; j < 2 * n; j++) aug[col][j] /= piv;
+    for (let r = 0; r < n; r++) {
+      if (r === col) continue;
+      const f = aug[r][col];
+      for (let j = 0; j < 2 * n; j++) aug[r][j] -= f * aug[col][j];
+    }
+  }
+  const inv = new Float64Array(n * n);
+  for (let i = 0; i < n; i++)
+    for (let j = 0; j < n; j++) inv[i * n + j] = aug[i][n + j];
+  return inv;
+}
+function buildMatrix(n, thet) {
+  const A = new Float64Array(n * n);
+  for (let i = 0; i < n; i++)
+    for (let j = 0; j < n; j++)
+      A[i * n + j] = (n - Math.max(i, j)) * Math.cos(thet[i] - thet[j]);
+  return A;
+}
+function matVec(M, v, n) {
+  const r = new Float64Array(n);
+  for (let i = 0; i < n; i++) {
+    let s = 0;
+    for (let j = 0; j < n; j++) s += M[i * n + j] * v[j];
+    r[i] = s;
+  }
+  return r;
+}
+function derivs(P, thet, n, Ainv, gamma, driveA, driveW, time, driveMode) {
+  const w = matVec(Ainv, P, n);
+  const dthet = new Float64Array(n);
+  const dP = new Float64Array(n);
+  for (let i = 0; i < n; i++) dthet[i] = w[i] / (MA * LE * LE);
+  for (let i = 0; i < n; i++) {
+    let ks = 0;
+    for (let k = 0; k < n; k++) {
+      if (k === i) continue;
+      ks += w[k] * (n - Math.max(i, k)) * Math.sin(thet[i] - thet[k]);
+    }
+    dP[i] = -(1 / (MA * LE * LE)) * w[i] * ks - MA * GR * LE * (n - i) * Math.sin(thet[i]) - (gamma / MA) * P[i];
+    if (driveMode === 'uniform') {
+      dP[i] += driveA * Math.sin(driveW * time);
+    } else if (driveMode === 'pivot-h') {
+      dP[i] += -MA * driveA * driveW * driveW * (n - i) * Math.sin(driveW * time) * Math.cos(thet[i]);
+    } else if (driveMode === 'pivot-v') {
+      dP[i] += MA * driveA * driveW * driveW * (n - i) * Math.sin(driveW * time) * Math.sin(thet[i]);
+    }
+  }
+  return { dP, dthet };
+}
+function computeDerivs(P, thet, n, gamma, driveA, driveW, time, driveMode) {
+  const A = buildMatrix(n, thet);
+  const Ainv = invertMatrix(A, n);
+  if (!Ainv) return null;
+  return derivs(P, thet, n, Ainv, gamma, driveA, driveW, time, driveMode);
+}
+function computeLagrangian(P, thet, n) {
+  const A = buildMatrix(n, thet);
+  const Ainv = invertMatrix(A, n);
+  if (!Ainv) return { L: 0, T: 0, V: 0, H: 0 };
+  const w = matVec(Ainv, P, n);
+  const td = new Float64Array(n);
+  for (let i = 0; i < n; i++) td[i] = w[i] / (MA * LE * LE);
+  let t1 = 0;
+  for (let j = 0; j < n; j++) t1 += (n - j) * td[j] * td[j];
+  let t2 = 0;
+  for (let k = 1; k < n; k++)
+    for (let j = 0; j < k; j++)
+      t2 += td[j] * td[k] * (n - k) * Math.cos(thet[k] - thet[j]);
+  t2 *= 2;
+  let t3 = 0;
+  for (let j = 0; j < n; j++) t3 += (n - j) * Math.cos(thet[j]);
+  t3 *= 2 * GR / LE;
+  const Lag = 0.5 * MA * LE * LE * (t1 + t2 + t3);
+  const T = 0.5 * MA * LE * LE * (t1 + t2);
+  let V = 0;
+  for (let j = 0; j < n; j++) V -= MA * GR * LE * (n - j) * Math.cos(thet[j]);
+  return { L: Lag, T, V, H: T + V };
+}
+function addVec(a, b, scale, n) {
+  const r = new Float64Array(n);
+  for (let i = 0; i < n; i++) r[i] = a[i] + scale * b[i];
+  return r;
+}
+function rk4Step(Pt, Tt, n, dt, gamma, driveA, driveW, time, driveMode) {
+  const d1 = computeDerivs(Pt, Tt, n, gamma, driveA, driveW, time, driveMode);
+  if (!d1) return null;
+  const P2 = addVec(Pt, d1.dP, 0.5*dt, n), T2 = addVec(Tt, d1.dthet, 0.5*dt, n);
+  const d2 = computeDerivs(P2, T2, n, gamma, driveA, driveW, time + 0.5*dt, driveMode);
+  if (!d2) return null;
+  const P3 = addVec(Pt, d2.dP, 0.5*dt, n), T3 = addVec(Tt, d2.dthet, 0.5*dt, n);
+  const d3 = computeDerivs(P3, T3, n, gamma, driveA, driveW, time + 0.5*dt, driveMode);
+  if (!d3) return null;
+  const P4 = addVec(Pt, d3.dP, dt, n), T4 = addVec(Tt, d3.dthet, dt, n);
+  const d4 = computeDerivs(P4, T4, n, gamma, driveA, driveW, time + dt, driveMode);
+  if (!d4) return null;
+  const Pnew = new Float64Array(n), Tnew = new Float64Array(n);
+  for (let i = 0; i < n; i++) {
+    Pnew[i] = Pt[i] + (dt/6)*(d1.dP[i]+2*d2.dP[i]+2*d3.dP[i]+d4.dP[i]);
+    Tnew[i] = Tt[i] + (dt/6)*(d1.dthet[i]+2*d2.dthet[i]+2*d3.dthet[i]+d4.dthet[i]);
+  }
+  return { P: Pnew, thet: Tnew };
+}
+function runSim(n, totalTime, dt, initAngle, gamma, driveA, driveW, driveMode) {
+  const numSteps = Math.floor(totalTime / dt);
+  const Parr = [], Tarr = [];
+  for (let i = 0; i < n; i++) { Parr.push(new Float64Array(numSteps)); Tarr.push(new Float64Array(numSteps)); }
+  const Lag = new Float64Array(numSteps), Energy = new Float64Array(numSteps);
+  for (let i = 0; i < n; i++) { Parr[i][0] = 0; Tarr[i][0] = initAngle; }
+  const p0arr = new Float64Array(n);
+  const l0 = computeLagrangian(p0arr, Tarr.map(a => a[0]), n);
+  Lag[0] = l0.L; Energy[0] = l0.H;
+  for (let t = 0; t < numSteps - 1; t++) {
+    const Pt = new Float64Array(n), Tt = new Float64Array(n);
+    for (let i = 0; i < n; i++) { Pt[i] = Parr[i][t]; Tt[i] = Tarr[i][t]; }
+    const step = rk4Step(Pt, Tt, n, dt, gamma, driveA, driveW, t * dt, driveMode);
+    if (!step) break;
+    for (let i = 0; i < n; i++) { Parr[i][t+1] = step.P[i]; Tarr[i][t+1] = step.thet[i]; }
+    const lc = computeLagrangian(step.P, step.thet, n);
+    Lag[t+1] = lc.L; Energy[t+1] = lc.H;
+  }
+  return { P: Parr, thet: Tarr, Lag, Energy, numSteps, n, dt, totalTime, initAngle, gamma, driveA, driveW, driveMode };
+}
+function estimateLyapunov(sd) {
+  const { P, thet, n, dt, totalTime, initAngle, numSteps, gamma, driveA, driveW, driveMode } = sd;
+  const gam = gamma || 0;
+  const dA = driveA || 0;
+  const dW = driveW || 0;
+  const dM = driveMode || 'none';
+  const eps = 1e-7;
+  const results = [];
+  for (let pen = 0; pen < n; pen++) {
+    const pNumSteps = numSteps;
+    const pP = [], pT = [];
+    for (let i = 0; i < n; i++) { pP.push(new Float64Array(pNumSteps)); pT.push(new Float64Array(pNumSteps)); }
+    for (let i = 0; i < n; i++) { pP[i][0] = 0; pT[i][0] = initAngle; }
+    pT[pen][0] += eps;
+    for (let t = 0; t < pNumSteps - 1; t++) {
+      const Pt = new Float64Array(n), Tt = new Float64Array(n);
+      for (let i = 0; i < n; i++) { Pt[i] = pP[i][t]; Tt[i] = pT[i][t]; }
+      const step = rk4Step(Pt, Tt, n, dt, gam, dA, dW, t * dt, dM);
+      if (!step) break;
+      for (let i = 0; i < n; i++) { pP[i][t+1] = step.P[i]; pT[i][t+1] = step.thet[i]; }
+    }
+    const logDist = [], times = [];
+    const sub = Math.max(1, Math.floor(numSteps / 500));
+    for (let t = 1; t < numSteps; t += sub) {
+      let dist2 = 0;
+      for (let i = 0; i < n; i++) {
+        const dth = thet[i][t] - pT[i][t];
+        const dp = P[i][t] - pP[i][t];
+        dist2 += dth * dth + dp * dp;
+      }
+      const dist = Math.sqrt(dist2);
+      if (dist > 0 && isFinite(dist)) {
+        logDist.push(Math.log(dist / eps));
+        times.push(t * dt);
+      }
+    }
+    if (times.length > 10) {
+      const nP = times.length;
+      let sx = 0, sy = 0, sxy = 0, sxx = 0;
+      const useN = Math.min(nP, Math.floor(nP * 0.5));
+      for (let i = 0; i < useN; i++) {
+        sx += times[i]; sy += logDist[i];
+        sxy += times[i] * logDist[i]; sxx += times[i] * times[i];
+      }
+      const slope = (useN * sxy - sx * sy) / (useN * sxx - sx * sx);
+      results.push({ pen, lambda: slope, times, logDist });
+    } else {
+      results.push({ pen, lambda: 0, times: [], logDist: [] });
+    }
+  }
+  return results;
+}
+function estimateCorrDim(sd, xK, yK, zK) {
+  const { numSteps } = sd;
+  const xKey = xK || $('sel-x').value, yKey = yK || $('sel-y').value, zKey = zK || $('sel-z').value;
+  const maxPts = 600;
+  const sub = Math.max(1, Math.floor(numSteps / maxPts));
+  const points = [];
+  for (let t = 0; t < numSteps; t += sub)
+    points.push([getAxisData(xKey, sd, t), getAxisData(yKey, sd, t), getAxisData(zKey, sd, t)]);
+  const N = points.length;
+  if (N < 50) return { dim: NaN, logR: [], logC: [] };
+  const dists = [];
+  for (let i = 0; i < N; i++)
+    for (let j = i + 1; j < N; j++) {
+      const dx = points[i][0]-points[j][0], dy = points[i][1]-points[j][1], dz = points[i][2]-points[j][2];
+      dists.push(Math.sqrt(dx*dx+dy*dy+dz*dz));
+    }
+  dists.sort((a, b) => a - b);
+  const totalPairs = dists.length;
+  const nBins = 30;
+  const rMin = dists[Math.floor(totalPairs * 0.01)] || 1e-10;
+  const rMax = dists[Math.floor(totalPairs * 0.8)] || 1;
+  const logRMin = Math.log(rMin), logRMax = Math.log(rMax);
+  const logR = [], logC = [];
+  for (let b = 0; b < nBins; b++) {
+    const lr = logRMin + (logRMax - logRMin) * b / (nBins - 1);
+    const r = Math.exp(lr);
+    let count = 0;
+    for (let d = 0; d < totalPairs; d++) { if (dists[d] <= r) count++; else break; }
+    const Cr = count / totalPairs;
+    if (Cr > 0) { logR.push(lr); logC.push(Math.log(Cr)); }
+  }
+  if (logR.length < 5) return { dim: NaN, logR, logC };
+  const start = Math.floor(logR.length * 0.2), end = Math.floor(logR.length * 0.8);
+  const pts = end - start;
+  if (pts < 3) return { dim: NaN, logR, logC };
+  let sx = 0, sy = 0, sxy = 0, sxx = 0;
+  for (let i = start; i < end; i++) {
+    sx += logR[i]; sy += logC[i]; sxy += logR[i]*logC[i]; sxx += logR[i]*logR[i];
+  }
+  const dim = (pts * sxy - sx * sy) / (pts * sxx - sx * sx);
+  return { dim, logR, logC, fitStart: start, fitEnd: end };
+}
+function scanAxisCombinations(sd) {
+  const n = sd.n;
+  const keys = ['L'];
+  for (let i = 0; i < n; i++) keys.push('thet-' + i);
+  for (let i = 0; i < n; i++) keys.push('P-' + i);
+  const combos = [];
+  for (let i = 0; i < n; i++) {
+    combos.push(['thet-'+i, 'P-'+i, 'L']);
+  }
+  for (let i = 0; i < n; i++) {
+    for (let j = i+1; j < n; j++) {
+      combos.push(['thet-'+i, 'P-'+i, 'thet-'+j]);
+      combos.push(['thet-'+i, 'P-'+i, 'P-'+j]);
+    }
+  }
+  for (let i = 0; i < n && i < 5; i++)
+    for (let j = i+1; j < n && j < 6; j++)
+      for (let k = j+1; k < n && k < 7; k++) {
+        combos.push(['thet-'+i, 'thet-'+j, 'thet-'+k]);
+        combos.push(['P-'+i, 'P-'+j, 'P-'+k]);
+      }
+  for (let i = 0; i < n && i < 5; i++)
+    for (let j = 0; j < n && j < 5; j++) {
+      if (i === j) continue;
+      for (let k = j+1; k < n && k < 6; k++) {
+        if (k === i) continue;
+        combos.push(['thet-'+i, 'P-'+j, 'thet-'+k]);
+      }
+    }
+  const seen = new Set();
+  const unique = [];
+  for (const c of combos) {
+    const key = c.join('|');
+    if (!seen.has(key)) { seen.add(key); unique.push(c); }
+  }
+  const results = [];
+  for (const c of unique) {
+    const cr = estimateCorrDim(sd, c[0], c[1], c[2]);
+    if (isNaN(cr.dim)) continue;
+    const frac = cr.dim % 1;
+    const fractality = Math.min(frac, 1 - frac);
+    results.push({ axes: c, dim: cr.dim, fractality });
+  }
+  results.sort((a, b) => b.fractality - a.fractality);
+  return results.slice(0, 8);
+}
+function plotStyle() {
+  const textColor = getComputedStyle(document.documentElement).getPropertyValue('--color-text-primary').trim() || '#000';
+  return { textColor, gridColor: 'rgba(128,128,128,0.15)', bg: 'rgba(0,0,0,0)' };
+}
+function getAxisData(key, sd, t) {
+  if (key === 'L') return sd.Lag[t];
+  const parts = key.split('-');
+  const pen = parseInt(parts[1]);
+  if (parts[0] === 'thet') return sd.thet[pen][t];
+  return sd.P[pen][t];
+}
+function getAxisLabel(key) {
+  if (key === 'L') return 'L';
+  const parts = key.split('-');
+  const pen = parseInt(parts[1]) + 1;
+  if (parts[0] === 'thet') return 'θ' + pen;
+  return 'P' + pen;
+}
+function renderPlot() {
+  if (!simData) return;
+  const { numSteps } = simData;
+  const pct = parseFloat($('sl-progress').value) / 1000;
+  const maxIdx = Math.max(2, Math.floor(pct * (numSteps - 1)));
+  const xKey = $('sel-x').value, yKey = $('sel-y').value, zKey = $('sel-z').value;
+  const plotMode = $('sel-mode').value;
+  const colorScheme = $('sel-color').value;
+  const x = [], y = [], z = [];
+  for (let t = 0; t < maxIdx; t++) {
+    x.push(getAxisData(xKey, simData, t));
+    y.push(getAxisData(yKey, simData, t));
+    z.push(getAxisData(zKey, simData, t));
+  }
+  const solidColors = {blue:'#2244ff',orange:'#ee8822',white:'#ffffff',red:'#dd3333',green:'#33bb55',purple:'#8844dd'};
+  const isSolid = colorScheme !== 'time';
+  const solidHex = solidColors[colorScheme] || '#2244ff';
+  const traces = [];
+  if (plotMode === 'lines') {
+    const lineOpts = isSolid
+      ? { color: solidHex, width: 1.2 }
+      : { color: x.map((_, i) => i), colorscale: 'Viridis', width: 2 };
+    traces.push({ x, y, z, type: 'scatter3d', mode: 'lines', name: 'Trajectory', line: lineOpts });
+  } else {
+    const markerOpts = isSolid
+      ? { color: solidHex, size: 1.2, opacity: 0.6 }
+      : { color: x.map((_, i) => i), colorscale: 'Viridis', size: 1.5, opacity: 0.7 };
+    traces.push({ x, y, z, type: 'scatter3d', mode: 'markers', name: 'Trajectory', marker: markerOpts });
+  }
+  if (x.length) traces.push({
+    x:[x[x.length-1]], y:[y[y.length-1]], z:[z[z.length-1]],
+    type:'scatter3d', mode:'markers', marker:{color:isSolid?solidHex:'#D85A30',size:5}, showlegend:false
+  });
+  const s = plotStyle();
+  const sceneBg = isSolid ? '#111111' : s.bg;
+  const sceneGrid = isSolid ? 'rgba(255,255,255,0.08)' : s.gridColor;
+  const sceneText = isSolid ? '#999999' : s.textColor;
+  Plotly.react('plot3d', traces, {
+    paper_bgcolor:s.bg, plot_bgcolor:s.bg, font:{color:sceneText,size:12}, margin:{l:0,r:0,t:30,b:0},
+    scene:{
+      xaxis:{title:getAxisLabel(xKey),gridcolor:sceneGrid,zerolinecolor:sceneGrid,color:sceneText},
+      yaxis:{title:getAxisLabel(yKey),gridcolor:sceneGrid,zerolinecolor:sceneGrid,color:sceneText},
+      zaxis:{title:getAxisLabel(zKey),gridcolor:sceneGrid,zerolinecolor:sceneGrid,color:sceneText},
+      bgcolor:sceneBg
+    },
+    legend:{x:0,y:1,bgcolor:'rgba(0,0,0,0)'}
+  }, {responsive:true});
+}
+function renderLyapPlot(res) {
+  const s = plotStyle(), traces = [];
+  for (const r of res) {
+    if (!r.times.length) continue;
+    traces.push({ x:r.times, y:r.logDist, type:'scatter', mode:'lines', name:'Pen '+(r.pen+1)+' (λ='+r.lambda.toFixed(2)+')', line:{color:COLORS[r.pen%COLORS.length],width:1.5} });
+  }
+  Plotly.react('plot-lyap', traces, {
+    paper_bgcolor:s.bg, plot_bgcolor:s.bg, font:{color:s.textColor,size:11}, margin:{l:50,r:10,t:30,b:40},
+    xaxis:{title:'Time (s)',gridcolor:s.gridColor}, yaxis:{title:'log(d/ε)',gridcolor:s.gridColor},
+    title:{text:'Lyapunov exponent estimation',font:{size:13}}, legend:{x:0,y:1,bgcolor:'rgba(0,0,0,0)',font:{size:10}}
+  }, {responsive:true});
+}
+function renderCorrPlot(cr) {
+  const s = plotStyle(), traces = [];
+  if (cr.logR.length) {
+    traces.push({ x:cr.logR, y:cr.logC, type:'scatter', mode:'markers', name:'C(r)', marker:{color:'#7F77DD',size:4} });
+    if (cr.fitStart !== undefined) {
+      traces.push({ x:cr.logR.slice(cr.fitStart,cr.fitEnd), y:cr.logC.slice(cr.fitStart,cr.fitEnd), type:'scatter', mode:'lines', name:'d = '+cr.dim.toFixed(2), line:{color:'#D85A30',width:2} });
+    }
+  }
+  Plotly.react('plot-corr', traces, {
+    paper_bgcolor:s.bg, plot_bgcolor:s.bg, font:{color:s.textColor,size:11}, margin:{l:50,r:10,t:30,b:40},
+    xaxis:{title:'log(r)',gridcolor:s.gridColor}, yaxis:{title:'log(C(r))',gridcolor:s.gridColor},
+    title:{text:'Correlation dimension',font:{size:13}}, legend:{x:0,y:1,bgcolor:'rgba(0,0,0,0)',font:{size:10}}
+  }, {responsive:true});
+}
+$('btn-run').addEventListener('click', () => {
+  stopPlay();
+  const n = parseInt($('sl-n').value), angle = parseFloat($('sl-angle').value)*Math.PI/180;
+  const totalTime = parseFloat($('sl-time').value), dt = dtMap[parseInt($('sl-dt').value)];
+  const gamma = parseInt($('sl-gamma').value) * 0.1;
+  const driveA = parseInt($('sl-drive-a').value) * 0.5;
+  const driveW = parseInt($('sl-drive-w').value) * 0.1;
+  const driveMode = $('sel-drive-mode').value;
+  $('status').textContent = 'Simulating...'; $('btn-run').disabled = true;
+  setTimeout(() => {
+    const t0 = performance.now();
+    simData = runSim(n, totalTime, dt, angle, gamma, driveA, driveW, driveMode);
+    $('status').textContent = 'Done in ' + ((performance.now()-t0)/1000).toFixed(2) + 's';
+    $('btn-run').disabled = false;
+    $('energy-drift').textContent = Math.abs(simData.Energy[simData.numSteps-1]-simData.Energy[0]).toExponential(2);
+    $('steps-count').textContent = simData.numSteps.toLocaleString();
+    $('lyap-val').textContent = '—'; $('corr-dim').textContent = '—'; $('verdict').textContent = '—';
+    $('suggestions-box').style.display = 'none';
+    $('sl-progress').value = 1000; $('out-progress').textContent = '100.0%';
+    renderPlot();
+  }, 50);
+});
+$('btn-chaos').addEventListener('click', () => {
+  if (!simData) { $('status').textContent = 'Run simulation first'; return; }
+  $('status').textContent = 'Analyzing chaos...'; $('btn-chaos').disabled = true;
+  setTimeout(() => {
+    const t0 = performance.now();
+    const lyap = estimateLyapunov(simData);
+    const corr = estimateCorrDim(simData);
+    const maxL = Math.max(...lyap.map(r => r.lambda));
+    const chaotic = maxL > 0.1;
+
+    $('status').textContent = 'Scanning axis combinations...';
+    setTimeout(() => {
+      const suggestions = scanAxisCombinations(simData);
+      const elapsed = ((performance.now()-t0)/1000).toFixed(2);
+      $('status').textContent = 'Analysis done in ' + elapsed + 's';
+      $('btn-chaos').disabled = false;
+
+      $('lyap-val').textContent = maxL.toFixed(2);
+      const d = corr.dim;
+      $('corr-dim').textContent = isNaN(d) ? '—' : d.toFixed(2);
+      const fractal = !isNaN(d) && (d % 1) > 0.1 && (d % 1) < 0.9;
+      if (chaotic && fractal) $('verdict').textContent = 'Strange attractor';
+      else if (chaotic) $('verdict').textContent = 'Chaotic';
+      else if (fractal) $('verdict').textContent = 'Fractal, not chaotic';
+      else $('verdict').textContent = 'Not chaotic';
+      renderLyapPlot(lyap);
+      renderCorrPlot(corr);
+
+      const box = $('suggestions-box');
+      const list = $('suggestions-list');
+      if (suggestions.length > 0) {
+        box.style.display = 'block';
+        let html = '<div style="display: grid; grid-template-columns: auto 1fr auto auto; gap: 0; border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-md); overflow: hidden;">';
+        html += '<div style="padding: 8px 12px; font-weight: 500; background: var(--color-background-secondary); border-bottom: 0.5px solid var(--color-border-tertiary);">Rank</div>';
+        html += '<div style="padding: 8px 12px; font-weight: 500; background: var(--color-background-secondary); border-bottom: 0.5px solid var(--color-border-tertiary); border-left: 0.5px solid var(--color-border-tertiary);">Axes</div>';
+        html += '<div style="padding: 8px 12px; font-weight: 500; background: var(--color-background-secondary); border-bottom: 0.5px solid var(--color-border-tertiary); border-left: 0.5px solid var(--color-border-tertiary);">Corr. dim.</div>';
+        html += '<div style="padding: 8px 12px; font-weight: 500; background: var(--color-background-secondary); border-bottom: 0.5px solid var(--color-border-tertiary); border-left: 0.5px solid var(--color-border-tertiary);">Apply</div>';
+        suggestions.forEach((s, idx) => {
+          const labels = s.axes.map(getAxisLabel).join(', ');
+          const border = idx < suggestions.length - 1 ? 'border-bottom: 0.5px solid var(--color-border-tertiary);' : '';
+          const dimFrac = s.dim % 1;
+          const isFrac = dimFrac > 0.1 && dimFrac < 0.9;
+          const dimStyle = isFrac ? 'font-weight: 500; color: var(--color-text-success);' : '';
+          html += '<div style="padding: 8px 12px; ' + border + '">' + (idx + 1) + '</div>';
+          html += '<div style="padding: 8px 12px; border-left: 0.5px solid var(--color-border-tertiary); ' + border + '">' + labels + '</div>';
+          html += '<div style="padding: 8px 12px; border-left: 0.5px solid var(--color-border-tertiary); ' + border + dimStyle + '">' + s.dim.toFixed(2) + '</div>';
+          html += '<div style="padding: 8px 12px; border-left: 0.5px solid var(--color-border-tertiary); ' + border + '"><button onclick="applyAxes(\'' + s.axes[0] + '\',\'' + s.axes[1] + '\',\'' + s.axes[2] + '\')">Set</button></div>';
+        });
+        html += '</div>';
+        list.innerHTML = html;
+      } else {
+        box.style.display = 'none';
+      }
+    }, 50);
+  }, 50);
+});
+$('btn-run').click();
+</script>
