@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chaotic Attractor Visualizer — n-body Pendulum</title>
+  <meta name="description" content="Interactive 3D visualization of strange attractors in driven damped n-body pendulum systems.">
+  <meta name="author" content="Eason Ha">
+  <meta property="og:title" content="Chaotic Attractor Visualizer">
+  <meta property="og:description" content="Interactive 3D visualization of strange attractors in driven damped n-body pendulum systems.">
+  <meta property="og:type" content="website">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Chaotic Attractor Visualizer">
+  <meta name="twitter:description" content="Explore chaos in n-body pendulums — Lyapunov exponents, correlation dimension, and more.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌀</text></svg>">
+  <style>
+    :root{--bg1:#fff;--bg2:#f5f5f4;--t1:#1a1a1a;--t2:#6b6b6b;--ts:#2e7d32;--b3:rgba(0,0,0,.15);--b2:rgba(0,0,0,.3);--rm:8px;--rl:12px;--fs:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif}
+    @media(prefers-color-scheme:dark){:root{--bg1:#1a1a1a;--bg2:#2a2a2a;--t1:#e8e8e8;--t2:#999;--ts:#66bb6a;--b3:rgba(255,255,255,.15);--b2:rgba(255,255,255,.3)}}
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:var(--fs);background:var(--bg1);color:var(--t1);line-height:1.6;max-width:1200px;margin:0 auto;padding:1rem}
+    h1{font-size:22px;font-weight:500;margin-bottom:.25rem}
+    .sub{font-size:14px;color:var(--t2);margin-bottom:1.5rem}
+    .g{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:1rem}
+    .g label{font-size:12px;color:var(--t2);display:block;margin-bottom:2px}
+    .si{display:flex;align-items:center;gap:4px}
+    .si input[type=range]{flex:1;accent-color:#534AB7}
+    .si input[type=number]{width:58px;height:26px;border:0.5px solid var(--b2);border-radius:var(--rm);padding:0 4px;font-size:12px;background:var(--bg1);color:var(--t1);text-align:center}
+    select{background:var(--bg1);color:var(--t1);border:0.5px solid var(--b2);border-radius:var(--rm);height:30px;padding:0 6px;font-size:12px;width:100%}
+    button{background:transparent;color:var(--t1);border:0.5px solid var(--b2);border-radius:var(--rm);padding:5px 14px;cursor:pointer;font-family:inherit;font-size:13px}
+    button:hover{background:var(--bg2)}button:active{transform:scale(.98)}button:disabled{opacity:.5;cursor:default}
+    details{border:0.5px solid var(--b3);border-radius:var(--rl)}
+    summary{padding:.75rem 1rem;cursor:pointer;font-size:14px;font-weight:500}
+    .card{background:var(--bg2);border-radius:var(--rm);padding:.6rem .8rem}
+    .card .lb{font-size:11px;color:var(--t2)}.card .vl{font-size:16px;font-weight:500}
+  </style>
+</head>
+<body>
+<h1>Chaotic attractor visualizer</h1>
+<p class="sub">Driven damped n-body pendulum — strange attractors, Lyapunov exponents, correlation dimension</p>
+<div style="margin-bottom:1rem">
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:12px">
+    <div><div style="display:flex;justify-content:space-between;align-items:baseline"><label style="font-size:12px;color:var(--t2)">Pendulums (n)</label><input type=number min=2 max=20 value=4 id=num-n style="width:50px;height:22px;border:0.5px solid var(--b2);border-radius:var(--rm);padding:0 4px;font-size:12px;background:var(--bg1);color:var(--t1);text-align:center"></div><input type=range min=2 max=20 value=4 step=1 id=sl-n style="width:100%;accent-color:#534AB7"></div>
+    <div><div style="display:flex;justify-content:space-between;align-items:baseline"><label style="font-size:12px;color:var(--t2)">Initial angle (°)</label><input type=number min=10 max=170 value=90 id=num-angle style="width:50px;height:22px;border:0.5px solid var(--b2);border-radius:var(--rm);padding:0 4px;font-size:12px;background:var(--bg1);color:var(--t1);text-align:center"></div><input type=range min=10 max=170 value=90 step=1 id=sl-angle style="width:100%;accent-color:#534AB7"></div>
+    <div><div style="display:flex;justify-content:space-between;align-items:baseline"><label style="font-size:12px;color:var(--t2)">Sim time (s)</label><input type=number min=2 max=600 value=8 id=num-time style="width:50px;height:22px;border:0.5px solid var(--b2);border-radius:var(--rm);padding:0 4px;font-size:12px;background:var(--bg1);color:var(--t1);text-align:center"></div><input type=range min=2 max=600 value=8 step=1 id=sl-time style="width:100%;accent-color:#534AB7"></div>
+    <div><div style="display:flex;justify-content:space-between;align-items:baseline"><label style="font-size:12px;color:var(--t2)">dt</label><input type=number min=0.001 max=0.01 value=0.005 step=0.001 id=num-dt style="width:58px;height:22px;border:0.5px solid var(--b2);border-radius:var(--rm);padding:0 4px;font-size:12px;background:var(--bg1);color:var(--t1);text-align:center"></div><input type=range min=1 max=4 value=2 step=1 id=sl-dt style="width:100%;accent-color:#534AB7"></div>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:12px">
+    <div><div style="display:flex;justify-content:space-between;align-items:baseline"><label style="font-size:12px;color:var(--t2)">Damping γ</label><input type=number min=0 max=2.5 value=0 step=0.01 id=num-gamma style="width:58px;height:22px;border:0.5px solid var(--b2);border-radius:var(--rm);padding:0 4px;font-size:12px;background:var(--bg1);color:var(--t1);text-align:center"></div><input type=range min=0 max=250 value=0 step=1 id=sl-gamma style="width:100%;accent-color:#534AB7"></div>
+    <div><label style="font-size:12px;color:var(--t2);display:block;margin-bottom:4px">Drive mode</label><select id=sel-drive-mode style="width:100%;height:28px;border:0.5px solid var(--b2);border-radius:var(--rm);padding:0 6px;font-size:12px;background:var(--bg1);color:var(--t1)"><option value=none>None</option><option value=uniform>Uniform torque</option><option value=pivot-h>Horiz. pivot</option><option value=pivot-v>Vert. pivot</option></select></div>
+    <div><div style="display:flex;justify-content:space-between;align-items:baseline"><label style="font-size:12px;color:var(--t2)">Drive amplitude A</label><input type=number min=0 max=50 value=0 step=0.1 id=num-drive-a style="width:50px;height:22px;border:0.5px solid var(--b2);border-radius:var(--rm);padding:0 4px;font-size:12px;background:var(--bg1);color:var(--t1);text-align:center"></div><input type=range min=0 max=100 value=0 step=1 id=sl-drive-a style="width:100%;accent-color:#534AB7"></div>
+    <div><div style="display:flex;justify-content:space-between;align-items:baseline"><label style="font-size:12px;color:var(--t2)">Drive frequency ω</label><input type=number min=0.1 max=10 value=2 step=0.1 id=num-drive-w style="width:50px;height:22px;border:0.5px solid var(--b2);border-radius:var(--rm);padding:0 4px;font-size:12px;background:var(--bg1);color:var(--t1);text-align:center"></div><input type=range min=1 max=100 value=20 step=1 id=sl-drive-w style="width:100%;accent-color:#534AB7"></div>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:12px">
+    <div><label style="font-size:12px;color:var(--t2);display:block;margin-bottom:4px">X axis</label><select id=sel-x style="width:100%;height:28px;border:0.5px solid var(--b2);border-radius:var(--rm);padding:0 6px;font-size:12px;background:var(--bg1);color:var(--t1)"></select></div>
+    <div><label style="font-size:12px;color:var(--t2);display:block;margin-bottom:4px">Y axis</label><select id=sel-y style="width:100%;height:28px;border:0.5px solid var(--b2);border-radius:var(--rm);padding:0 6px;font-size:12px;background:var(--bg1);color:var(--t1)"></select></div>
+    <div><label style="font-size:12px;color:var(--t2);display:block;margin-bottom:4px">Z axis</label><select id=sel-z style="width:100%;height:28px;border:0.5px solid var(--b2);border-radius:var(--rm);padding:0 6px;font-size:12px;background:var(--bg1);color:var(--t1)"></select></div>
+    <div><label style="font-size:12px;color:var(--t2);display:block;margin-bottom:4px">Plot mode</label><select id=sel-mode style="width:100%;height:28px;border:0.5px solid var(--b2);border-radius:var(--rm);padding:0 6px;font-size:12px;background:var(--bg1);color:var(--t1)"><option value=lines>Lines</option><option value=markers>Points</option></select></div>
+    <div><label style="font-size:12px;color:var(--t2);display:block;margin-bottom:4px">Color</label><select id=sel-color style="width:100%;height:28px;border:0.5px solid var(--b2);border-radius:var(--rm);padding:0 6px;font-size:12px;background:var(--bg1);color:var(--t1)"><option value=time>By time</option><option value=blue>Solid blue</option><option value=orange>Solid orange</option><option value=white>Solid white</option><option value=red>Solid red</option><option value=green>Solid green</option><option value=purple>Solid purple</option></select></div>
+  </div>
+</div>
+<div style="display:flex;gap:8px;margin-bottom:1rem;flex-wrap:wrap">
+  <button id=btn-run>Run simulation</button>
+  <button id=btn-chaos>Analyze chaos</button>
+</div>
+<div style="font-size:13px;color:var(--t2);margin-bottom:8px" id=status></div>
+<div class="g" style="grid-template-columns:repeat(auto-fit,minmax(100px,1fr));margin-bottom:10px">
+  <div class="card"><div class="lb">Energy drift</div><div class="vl" id=energy-drift>—</div></div>
+  <div class="card"><div class="lb">Steps</div><div class="vl" id=steps-count>—</div></div>
+  <div class="card"><div class="lb">Max Lyapunov λ</div><div class="vl" id=lyap-val>—</div></div>
+  <div class="card"><div class="lb">Corr. dimension</div><div class="vl" id=corr-dim>—</div></div>
+  <div class="card"><div class="lb">Verdict</div><div class="vl" id=verdict>—</div></div>
+</div>
+<details style="margin-bottom:10px"><summary>How to interpret results</summary>
+<div style="padding:0 1rem 1rem;font-size:13px;color:var(--t2);line-height:1.7">
+  <p style="margin-bottom:8px"><b style="color:var(--t1)">Max Lyapunov λ</b> — positive = chaos (exponential divergence). Estimated via Benettin renormalization: perturbation is periodically rescaled to stay small, accumulating the local stretching rate along the attractor.</p>
+  <p style="margin-bottom:8px"><b style="color:var(--t1)">Correlation dimension</b> — non-integer = fractal. Integer (1 = cycle, 2 = torus) = regular. Grassberger-Procaccia algorithm on the plotted 3D trajectory.</p>
+  <p style="margin-bottom:8px"><b style="color:var(--t1)">Energy drift</b> — for γ=0, H should be conserved. Large drift = numerical error.</p>
+  <p><b style="color:var(--t1)">Verdict</b> — λ>0.1 AND non-integer dim = Strange attractor. λ>0.1 only = Chaotic. Non-integer only = Fractal. Neither = Not chaotic.</p>
+</div></details>
+<div id=suggestions-box style="display:none;margin-bottom:10px;border:0.5px solid var(--b3);border-radius:var(--rl);padding:1rem">
+  <div style="font-size:14px;font-weight:500;margin-bottom:6px">Suggested projections</div>
+  <div style="font-size:12px;color:var(--t2);margin-bottom:8px">Ranked by how non-integer the correlation dimension is (most fractal first).</div>
+  <div id=suggestions-list></div>
+</div>
+<div id=plot3d style="width:100%;height:500px"></div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:10px">
+  <div id=plot-lyap style="width:100%;height:280px"></div>
+  <div id=plot-corr style="width:100%;height:280px"></div>
+</div>
+<div style="margin-top:12px">
+  <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;flex-wrap:wrap">
+    <button id=btn-play style="min-width:65px">Play</button>
+    <button id=btn-reset style="min-width:65px">Reset</button>
+    <label style="font-size:12px;color:var(--t2)">Speed</label>
+    <input type=range min=1 max=10 value=5 step=1 id=sl-speed style="flex:0 0 100px">
+    <span style="font-size:12px;font-weight:500;min-width:30px" id=out-speed>1x</span>
+  </div>
+  <div style="display:flex;align-items:center;gap:8px">
+    <label style="font-size:12px;color:var(--t2);white-space:nowrap">Time</label>
+    <input type=range min=0 max=1000 value=1000 step=1 id=sl-progress style="flex:1">
+    <span style="font-size:12px;font-weight:500;min-width:40px" id=out-progress>100.0%</span>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/plotly.js-dist-min@2.35.0/plotly.min.js"></script>
+<script>
+const dtMap={1:.01,2:.005,3:.002,4:.001};
+const GR=9.8,MA=1,LE=1;
+let simData=null;
+const $=id=>document.getElementById(id);
+
+// --- Typable slider pairs ---
+function linkPair(slId,numId,toNum,toSl){
+  const sl=$(slId),nm=$(numId);
+  sl.addEventListener('input',()=>{nm.value=toNum(sl.value)});
+  nm.addEventListener('change',()=>{
+    let v=parseFloat(nm.value);
+    const lo=parseFloat(nm.min),hi=parseFloat(nm.max);
+    if(isNaN(v)||v<lo)v=lo;if(v>hi)v=hi;
+    nm.value=v;sl.value=toSl(v);sl.dispatchEvent(new Event('input'));
+  });
+}
+linkPair('sl-n','num-n',v=>v,v=>v);
+linkPair('sl-angle','num-angle',v=>v,v=>v);
+linkPair('sl-time','num-time',v=>v,v=>v);
+linkPair('sl-dt','num-dt',v=>dtMap[v],v=>{for(let k in dtMap)if(Math.abs(dtMap[k]-v)<1e-5)return k;return 2});
+linkPair('sl-gamma','num-gamma',v=>(v*0.01).toFixed(2),v=>Math.round(v/0.01));
+linkPair('sl-drive-a','num-drive-a',v=>(v*0.5).toFixed(1),v=>Math.round(v/0.5));
+linkPair('sl-drive-w','num-drive-w',v=>(v*0.1).toFixed(1),v=>Math.round(v/0.1));
+// Init display
+$('num-gamma').value='0.00';$('num-drive-a').value='0.0';$('num-drive-w').value='2.0';$('num-dt').value=dtMap[2];
+
+function getParam(slId,numId,mul){return parseFloat($(numId).value)}
+const speedMap={1:.05,2:.1,3:.2,4:.5,5:1,6:2,7:4,8:8,9:16,10:32};
+const speedLabels={1:'0.05x',2:'0.1x',3:'0.2x',4:'0.5x',5:'1x',6:'2x',7:'4x',8:'8x',9:'16x',10:'32x'};
+let playing=false,animFrame=null,lastFrameTime=0;
+
+$('sl-progress').addEventListener('input',()=>{
+  $('out-progress').textContent=(parseInt($('sl-progress').value)/10).toFixed(1)+'%';
+  if(simData)renderPlot();
+});
+$('sl-speed').addEventListener('input',()=>$('out-speed').textContent=speedLabels[parseInt($('sl-speed').value)]);
+
+function startPlay(){
+  if(!simData)return;
+  if(parseInt($('sl-progress').value)>=1000)$('sl-progress').value=0;
+  playing=true;$('btn-play').textContent='Pause';
+  lastFrameTime=performance.now();animFrame=requestAnimationFrame(animTick);
+}
+function stopPlay(){playing=false;$('btn-play').textContent='Play';if(animFrame){cancelAnimationFrame(animFrame);animFrame=null}}
+function animTick(now){
+  if(!playing||!simData)return;
+  const d=(now-lastFrameTime)/1000;lastFrameTime=now;
+  const sp=speedMap[parseInt($('sl-speed').value)];
+  let cur=parseFloat($('sl-progress').value)+(d*sp/simData.totalTime)*1000;
+  if(cur>=1000){cur=1000;stopPlay()}
+  $('sl-progress').value=cur;
+  $('out-progress').textContent=(cur/10).toFixed(1)+'%';
+  renderPlot();
+  if(playing)animFrame=requestAnimationFrame(animTick);
+}
+$('btn-play').addEventListener('click',()=>{if(playing)stopPlay();else startPlay()});
+$('btn-reset').addEventListener('click',()=>{stopPlay();$('sl-progress').value=0;$('out-progress').textContent='0.0%';if(simData)renderPlot()});
+
+// --- Axis selectors ---
+$('sl-n').addEventListener('input',updateAxSel);
+updateAxSel();
+function updateAxSel(){
+  const n=parseInt($('sl-n').value);
+  ['sel-x','sel-y','sel-z'].forEach((sid,si)=>{
+    const sel=$(sid),prev=sel.value||['thet-0','P-0','L'][si];
+    sel.innerHTML='<option value=L>Lagrangian</option>';
+    for(let i=0;i<n;i++)sel.innerHTML+=`<option value=thet-${i}>θ${i+1}</option>`;
+    for(let i=0;i<n;i++)sel.innerHTML+=`<option value=P-${i}>P${i+1}</option>`;
+    if([...sel.options].some(o=>o.value===prev))sel.value=prev;
+  });
+}
+['sel-x','sel-y','sel-z','sel-mode','sel-color'].forEach(id=>$(id).addEventListener('change',()=>{if(simData)renderPlot()}));
+
+// --- Physics ---
+function invertMatrix(A,n){
+  const aug=[];
+  for(let i=0;i<n;i++){aug[i]=new Float64Array(2*n);for(let j=0;j<n;j++)aug[i][j]=A[i*n+j];aug[i][n+i]=1}
+  for(let c=0;c<n;c++){
+    let mr=c,mv=Math.abs(aug[c][c]);
+    for(let r=c+1;r<n;r++){const v=Math.abs(aug[r][c]);if(v>mv){mv=v;mr=r}}
+    if(mr!==c){const t=aug[c];aug[c]=aug[mr];aug[mr]=t}
+    const p=aug[c][c];if(Math.abs(p)<1e-14)return null;
+    for(let j=0;j<2*n;j++)aug[c][j]/=p;
+    for(let r=0;r<n;r++){if(r===c)continue;const f=aug[r][c];for(let j=0;j<2*n;j++)aug[r][j]-=f*aug[c][j]}
+  }
+  const inv=new Float64Array(n*n);
+  for(let i=0;i<n;i++)for(let j=0;j<n;j++)inv[i*n+j]=aug[i][n+j];
+  return inv;
+}
+function buildMatrix(n,th){
+  const A=new Float64Array(n*n);
+  for(let i=0;i<n;i++)for(let j=0;j<n;j++)A[i*n+j]=(n-Math.max(i,j))*Math.cos(th[i]-th[j]);
+  return A;
+}
+function matVec(M,v,n){const r=new Float64Array(n);for(let i=0;i<n;i++){let s=0;for(let j=0;j<n;j++)s+=M[i*n+j]*v[j];r[i]=s}return r}
+function derivsFull(P,th,n,Ainv,gam,dA,dW,time,dM){
+  const w=matVec(Ainv,P,n),dthet=new Float64Array(n),dP=new Float64Array(n);
+  for(let i=0;i<n;i++)dthet[i]=w[i]/(MA*LE*LE);
+  for(let i=0;i<n;i++){
+    let ks=0;for(let k=0;k<n;k++){if(k===i)continue;ks+=w[k]*(n-Math.max(i,k))*Math.sin(th[i]-th[k])}
+    dP[i]=-(1/(MA*LE*LE))*w[i]*ks-MA*GR*LE*(n-i)*Math.sin(th[i])-(gam/MA)*P[i];
+    if(dM==='uniform')dP[i]+=dA*Math.sin(dW*time);
+    else if(dM==='pivot-h')dP[i]+=-MA*dA*dW*dW*(n-i)*Math.sin(dW*time)*Math.cos(th[i]);
+    else if(dM==='pivot-v')dP[i]+=MA*dA*dW*dW*(n-i)*Math.sin(dW*time)*Math.sin(th[i]);
+  }
+  return{dP,dthet};
+}
+function compDerivs(P,th,n,gam,dA,dW,t,dM){
+  const A=buildMatrix(n,th),Ai=invertMatrix(A,n);if(!Ai)return null;
+  return derivsFull(P,th,n,Ai,gam,dA,dW,t,dM);
+}
+function compLag(P,th,n){
+  const A=buildMatrix(n,th),Ai=invertMatrix(A,n);if(!Ai)return{L:0,T:0,V:0,H:0};
+  const w=matVec(Ai,P,n),td=new Float64Array(n);
+  for(let i=0;i<n;i++)td[i]=w[i]/(MA*LE*LE);
+  let t1=0;for(let j=0;j<n;j++)t1+=(n-j)*td[j]*td[j];
+  let t2=0;for(let k=1;k<n;k++)for(let j=0;j<k;j++)t2+=td[j]*td[k]*(n-k)*Math.cos(th[k]-th[j]);t2*=2;
+  let t3=0;for(let j=0;j<n;j++)t3+=(n-j)*Math.cos(th[j]);t3*=2*GR/LE;
+  const Lag=.5*MA*LE*LE*(t1+t2+t3),T=.5*MA*LE*LE*(t1+t2);
+  let V=0;for(let j=0;j<n;j++)V-=MA*GR*LE*(n-j)*Math.cos(th[j]);
+  return{L:Lag,T,V,H:T+V};
+}
+function addV(a,b,s,n){const r=new Float64Array(n);for(let i=0;i<n;i++)r[i]=a[i]+s*b[i];return r}
+function rk4(Pt,Tt,n,dt,gam,dA,dW,t,dM){
+  const d1=compDerivs(Pt,Tt,n,gam,dA,dW,t,dM);if(!d1)return null;
+  const d2=compDerivs(addV(Pt,d1.dP,.5*dt,n),addV(Tt,d1.dthet,.5*dt,n),n,gam,dA,dW,t+.5*dt,dM);if(!d2)return null;
+  const d3=compDerivs(addV(Pt,d2.dP,.5*dt,n),addV(Tt,d2.dthet,.5*dt,n),n,gam,dA,dW,t+.5*dt,dM);if(!d3)return null;
+  const d4=compDerivs(addV(Pt,d3.dP,dt,n),addV(Tt,d3.dthet,dt,n),n,gam,dA,dW,t+dt,dM);if(!d4)return null;
+  const Pn=new Float64Array(n),Tn=new Float64Array(n);
+  for(let i=0;i<n;i++){Pn[i]=Pt[i]+(dt/6)*(d1.dP[i]+2*d2.dP[i]+2*d3.dP[i]+d4.dP[i]);Tn[i]=Tt[i]+(dt/6)*(d1.dthet[i]+2*d2.dthet[i]+2*d3.dthet[i]+d4.dthet[i])}
+  return{P:Pn,thet:Tn};
+}
+function runSim(n,totT,dt,ia,gam,dA,dW,dM){
+  const ns=Math.floor(totT/dt),Pa=[],Ta=[];
+  for(let i=0;i<n;i++){Pa.push(new Float64Array(ns));Ta.push(new Float64Array(ns))}
+  const Lag=new Float64Array(ns),En=new Float64Array(ns);
+  for(let i=0;i<n;i++){Pa[i][0]=0;Ta[i][0]=ia}
+  const l0=compLag(new Float64Array(n),Ta.map(a=>a[0]),n);Lag[0]=l0.L;En[0]=l0.H;
+  for(let t=0;t<ns-1;t++){
+    const Pt=new Float64Array(n),Tt=new Float64Array(n);
+    for(let i=0;i<n;i++){Pt[i]=Pa[i][t];Tt[i]=Ta[i][t]}
+    const s=rk4(Pt,Tt,n,dt,gam,dA,dW,t*dt,dM);if(!s)break;
+    for(let i=0;i<n;i++){Pa[i][t+1]=s.P[i];Ta[i][t+1]=s.thet[i]}
+    const lc=compLag(s.P,s.thet,n);Lag[t+1]=lc.L;En[t+1]=lc.H;
+  }
+  return{P:Pa,thet:Ta,Lag,Energy:En,numSteps:ns,n,dt,totalTime:totT,initAngle:ia,gamma:gam,driveA:dA,driveW:dW,driveMode:dM};
+}
+
+// --- Benettin Lyapunov ---
+function estimateLyapunov(sd){
+  const{P,thet,n,dt,initAngle,numSteps,gamma:gam,driveA:dA,driveW:dW,driveMode:dM}=sd;
+  const eps=1e-7,renormInterval=Math.max(10,Math.floor(0.5/dt));
+  const skip=Math.floor(numSteps/5);
+  const results=[];
+  for(let pen=0;pen<n;pen++){
+    let pP=new Float64Array(n),pT=new Float64Array(n);
+    for(let i=0;i<n;i++){pP[i]=P[i][skip];pT[i]=thet[i][skip]}
+    pT[pen]+=eps;
+    let lambdaSum=0,renormCount=0;
+    const lambdaHistory=[],timeHistory=[];
+    for(let t=skip;t<numSteps-1;t++){
+      const oP=new Float64Array(n),oT=new Float64Array(n);
+      for(let i=0;i<n;i++){oP[i]=P[i][t];oT[i]=thet[i][t]}
+      const sP=rk4(pP,pT,n,dt,gam,dA,dW,t*dt,dM);
+      if(!sP)break;pP=sP.P;pT=sP.thet;
+      if((t-skip)%renormInterval===0&&t>skip){
+        let dist2=0;
+        for(let i=0;i<n;i++){
+          const dth=thet[i][t+1]-pT[i],dp=P[i][t+1]-pP[i];
+          dist2+=dth*dth+dp*dp;
+        }
+        const dist=Math.sqrt(dist2);
+        if(dist>0&&isFinite(dist)){
+          lambdaSum+=Math.log(dist/eps);renormCount++;
+          const runLam=lambdaSum/(renormCount*renormInterval*dt);
+          lambdaHistory.push(runLam);timeHistory.push((t-skip)*dt);
+          const dir=1/dist;
+          for(let i=0;i<n;i++){
+            pP[i]=P[i][t+1]+eps*dir*(pP[i]-P[i][t+1]);
+            pT[i]=thet[i][t+1]+eps*dir*(pT[i]-thet[i][t+1]);
+          }
+        }
+      }
+    }
+    const lam=renormCount>0?lambdaSum/(renormCount*renormInterval*dt):0;
+    results.push({pen,lambda:lam,times:timeHistory,lambdaHistory});
+  }
+  return results;
+}
+
+// --- Correlation dimension ---
+function estimateCorrDim(sd,xK,yK,zK){
+  const{numSteps}=sd;const xKey=xK||$('sel-x').value,yKey=yK||$('sel-y').value,zKey=zK||$('sel-z').value;
+  const maxP=600,sub=Math.max(1,Math.floor(numSteps/maxP)),pts=[];
+  for(let t=0;t<numSteps;t+=sub)pts.push([getAD(xKey,sd,t),getAD(yKey,sd,t),getAD(zKey,sd,t)]);
+  const N=pts.length;if(N<50)return{dim:NaN,logR:[],logC:[]};
+  const ds=[];
+  for(let i=0;i<N;i++)for(let j=i+1;j<N;j++){const a=pts[i][0]-pts[j][0],b=pts[i][1]-pts[j][1],c=pts[i][2]-pts[j][2];ds.push(Math.sqrt(a*a+b*b+c*c))}
+  ds.sort((a,b)=>a-b);const tp=ds.length,nB=30;
+  const rMn=ds[Math.floor(tp*.01)]||1e-10,rMx=ds[Math.floor(tp*.8)]||1;
+  const lrMn=Math.log(rMn),lrMx=Math.log(rMx),logR=[],logC=[];
+  for(let b=0;b<nB;b++){const lr=lrMn+(lrMx-lrMn)*b/(nB-1),r=Math.exp(lr);let c=0;for(let d=0;d<tp;d++){if(ds[d]<=r)c++;else break}const Cr=c/tp;if(Cr>0){logR.push(lr);logC.push(Math.log(Cr))}}
+  if(logR.length<5)return{dim:NaN,logR,logC};
+  const s0=Math.floor(logR.length*.2),s1=Math.floor(logR.length*.8),np=s1-s0;
+  if(np<3)return{dim:NaN,logR,logC};
+  let sx=0,sy=0,sxy=0,sxx=0;
+  for(let i=s0;i<s1;i++){sx+=logR[i];sy+=logC[i];sxy+=logR[i]*logC[i];sxx+=logR[i]*logR[i]}
+  return{dim:(np*sxy-sx*sy)/(np*sxx-sx*sx),logR,logC,fitStart:s0,fitEnd:s1};
+}
+
+// --- Plot helpers ---
+function getAD(key,sd,t){if(key==='L')return sd.Lag[t];const p=key.split('-'),i=parseInt(p[1]);return p[0]==='thet'?sd.thet[i][t]:sd.P[i][t]}
+function getAL(key){if(key==='L')return'L';const p=key.split('-'),i=parseInt(p[1])+1;return(p[0]==='thet'?'θ':'P')+i}
+function pStyle(){const t=getComputedStyle(document.documentElement).getPropertyValue('--t1').trim()||'#000';return{tc:t,gc:'rgba(128,128,128,.15)',bg:'rgba(0,0,0,0)'}}
+
+let plotLayout=null;
+function renderPlot(){
+  if(!simData)return;
+  const{numSteps}=simData,pct=parseFloat($('sl-progress').value)/1000;
+  const maxI=Math.max(2,Math.floor(pct*(numSteps-1)));
+  const xK=$('sel-x').value,yK=$('sel-y').value,zK=$('sel-z').value;
+  const mode=$('sel-mode').value,col=$('sel-color').value;
+  const x=[],y=[],z=[];
+  for(let t=0;t<maxI;t++){x.push(getAD(xK,simData,t));y.push(getAD(yK,simData,t));z.push(getAD(zK,simData,t))}
+  const solidC={blue:'#2244ff',orange:'#ee8822',white:'#fff',red:'#dd3333',green:'#33bb55',purple:'#8844dd'};
+  const isSolid=col!=='time',hex=solidC[col]||'#2244ff';
+  const traces=[];
+  if(mode==='lines'){
+    traces.push({x,y,z,type:'scatter3d',mode:'lines',name:'Trajectory',
+      line:isSolid?{color:hex,width:1.2}:{color:x.map((_,i)=>i),colorscale:'Viridis',width:2}});
+  }else{
+    traces.push({x,y,z,type:'scatter3d',mode:'markers',name:'Trajectory',
+      marker:isSolid?{color:hex,size:1.2,opacity:.6}:{color:x.map((_,i)=>i),colorscale:'Viridis',size:1.5,opacity:.7}});
+  }
+  if(x.length)traces.push({x:[x[x.length-1]],y:[y[y.length-1]],z:[z[z.length-1]],type:'scatter3d',mode:'markers',marker:{color:isSolid?hex:'#D85A30',size:5},showlegend:false});
+  const s=pStyle(),sBg=isSolid?'#111':s.bg,sG=isSolid?'rgba(255,255,255,.08)':s.gc,sT=isSolid?'#999':s.tc;
+  const newLayout={
+    paper_bgcolor:s.bg,plot_bgcolor:s.bg,font:{color:sT,size:12},margin:{l:0,r:0,t:30,b:0},
+    scene:{xaxis:{title:getAL(xK),gridcolor:sG,zerolinecolor:sG,color:sT},yaxis:{title:getAL(yK),gridcolor:sG,zerolinecolor:sG,color:sT},zaxis:{title:getAL(zK),gridcolor:sG,zerolinecolor:sG,color:sT},bgcolor:sBg},
+    legend:{x:0,y:1,bgcolor:'rgba(0,0,0,0)'}
+  };
+  // Preserve camera during playback
+  const plotDiv=$('plot3d');
+  if(playing&&plotDiv.layout&&plotDiv.layout.scene&&plotDiv.layout.scene.camera){
+    newLayout.scene.camera=plotDiv.layout.scene.camera;
+  }
+  Plotly.react('plot3d',traces,newLayout,{responsive:true});
+}
+function renderLyapPlot(res){
+  const s=pStyle(),traces=[];
+  for(const r of res){
+    if(!r.times.length)continue;
+    traces.push({x:r.times,y:r.lambdaHistory,type:'scatter',mode:'lines',name:'Pen '+(r.pen+1)+' (λ='+r.lambda.toFixed(3)+')',line:{color:['#7F77DD','#1D9E75','#D85A30','#378ADD','#D4537E','#639922','#BA7517','#E24B4A'][r.pen%8],width:1.5}});
+  }
+  Plotly.react('plot-lyap',traces,{
+    paper_bgcolor:s.bg,plot_bgcolor:s.bg,font:{color:s.tc,size:11},margin:{l:50,r:10,t:30,b:40},
+    xaxis:{title:'Time (s)',gridcolor:s.gc},yaxis:{title:'Running λ estimate',gridcolor:s.gc},
+    title:{text:'Benettin Lyapunov exponent',font:{size:13}},legend:{x:0,y:1,bgcolor:'rgba(0,0,0,0)',font:{size:10}}
+  },{responsive:true});
+}
+function renderCorrPlot(cr){
+  const s=pStyle(),traces=[];
+  if(cr.logR.length){
+    traces.push({x:cr.logR,y:cr.logC,type:'scatter',mode:'markers',name:'C(r)',marker:{color:'#7F77DD',size:4}});
+    if(cr.fitStart!==undefined)traces.push({x:cr.logR.slice(cr.fitStart,cr.fitEnd),y:cr.logC.slice(cr.fitStart,cr.fitEnd),type:'scatter',mode:'lines',name:'d = '+cr.dim.toFixed(2),line:{color:'#D85A30',width:2}});
+  }
+  Plotly.react('plot-corr',traces,{
+    paper_bgcolor:s.bg,plot_bgcolor:s.bg,font:{color:s.tc,size:11},margin:{l:50,r:10,t:30,b:40},
+    xaxis:{title:'log(r)',gridcolor:s.gc},yaxis:{title:'log(C(r))',gridcolor:s.gc},
+    title:{text:'Correlation dimension',font:{size:13}},legend:{x:0,y:1,bgcolor:'rgba(0,0,0,0)',font:{size:10}}
+  },{responsive:true});
+}
+
+// --- Axis scan ---
+function scanAxisCombinations(sd){
+  const n=sd.n,combos=[];
+  for(let i=0;i<n;i++)combos.push(['thet-'+i,'P-'+i,'L']);
+  for(let i=0;i<n;i++)for(let j=i+1;j<n;j++){combos.push(['thet-'+i,'P-'+i,'thet-'+j]);combos.push(['thet-'+i,'P-'+i,'P-'+j])}
+  for(let i=0;i<n&&i<5;i++)for(let j=i+1;j<n&&j<6;j++)for(let k=j+1;k<n&&k<7;k++){combos.push(['thet-'+i,'thet-'+j,'thet-'+k]);combos.push(['P-'+i,'P-'+j,'P-'+k])}
+  for(let i=0;i<n&&i<5;i++)for(let j=0;j<n&&j<5;j++){if(i===j)continue;for(let k=j+1;k<n&&k<6;k++){if(k===i)continue;combos.push(['thet-'+i,'P-'+j,'thet-'+k])}}
+  const seen=new Set,unique=[];
+  for(const c of combos){const k=c.join('|');if(!seen.has(k)){seen.add(k);unique.push(c)}}
+  const results=[];
+  for(const c of unique){
+    const cr=estimateCorrDim(sd,c[0],c[1],c[2]);
+    if(isNaN(cr.dim))continue;
+    const frac=cr.dim%1,fractality=Math.min(frac,1-frac);
+    results.push({axes:c,dim:cr.dim,fractality});
+  }
+  results.sort((a,b)=>b.fractality-a.fractality);
+  return results.slice(0,8);
+}
+function applyAxes(x,y,z){
+  const n=parseInt($('num-n').value);
+  function ok(k){if(k==='L')return true;return parseInt(k.split('-')[1])<n}
+  if(!ok(x)||!ok(y)||!ok(z)){$('status').textContent='Not enough pendulums for this combination';return}
+  $('sel-x').value=x;$('sel-y').value=y;$('sel-z').value=z;
+  if(simData)renderPlot();
+}
+
+// --- Run button ---
+$('btn-run').addEventListener('click',()=>{
+  stopPlay();
+  const n=parseInt($('num-n').value),angle=parseFloat($('num-angle').value)*Math.PI/180;
+  const totT=parseFloat($('num-time').value),dt=parseFloat($('num-dt').value);
+  const gam=parseFloat($('num-gamma').value),dA=parseFloat($('num-drive-a').value),dW=parseFloat($('num-drive-w').value);
+  const dM=$('sel-drive-mode').value;
+  $('status').textContent='Simulating...';$('btn-run').disabled=true;
+  setTimeout(()=>{
+    const t0=performance.now();
+    simData=runSim(n,totT,dt,angle,gam,dA,dW,dM);
+    $('status').textContent='Done in '+((performance.now()-t0)/1000).toFixed(2)+'s';
+    $('btn-run').disabled=false;
+    $('energy-drift').textContent=Math.abs(simData.Energy[simData.numSteps-1]-simData.Energy[0]).toExponential(2);
+    $('steps-count').textContent=simData.numSteps.toLocaleString();
+    $('lyap-val').textContent='—';$('corr-dim').textContent='—';$('verdict').textContent='—';
+    $('suggestions-box').style.display='none';
+    $('sl-progress').value=1000;$('out-progress').textContent='100.0%';
+    renderPlot();
+  },50);
+});
+
+// --- Chaos analysis ---
+$('btn-chaos').addEventListener('click',()=>{
+  if(!simData){$('status').textContent='Run simulation first';return}
+  $('status').textContent='Analyzing (Benettin + correlation)...';$('btn-chaos').disabled=true;
+  setTimeout(()=>{
+    const t0=performance.now();
+    const lyap=estimateLyapunov(simData);
+    const corr=estimateCorrDim(simData);
+    const maxL=Math.max(...lyap.map(r=>r.lambda));
+    $('lyap-val').textContent=maxL.toFixed(3);
+    const d=corr.dim;$('corr-dim').textContent=isNaN(d)?'—':d.toFixed(2);
+    const chaotic=maxL>0.1,fractal=!isNaN(d)&&(d%1)>.1&&(d%1)<.9;
+    if(chaotic&&fractal)$('verdict').textContent='Strange attractor';
+    else if(chaotic)$('verdict').textContent='Chaotic';
+    else if(fractal)$('verdict').textContent='Fractal, not chaotic';
+    else $('verdict').textContent='Not chaotic';
+    renderLyapPlot(lyap);renderCorrPlot(corr);
+
+    $('status').textContent='Scanning axis combinations...';
+    setTimeout(()=>{
+      const suggestions=scanAxisCombinations(simData);
+      $('status').textContent='Analysis done in '+((performance.now()-t0)/1000).toFixed(2)+'s';
+      $('btn-chaos').disabled=false;
+      const box=$('suggestions-box'),list=$('suggestions-list');
+      if(suggestions.length>0){
+        box.style.display='block';
+        let h='<div style="display:grid;grid-template-columns:40px 1fr 80px 60px;gap:0;border:0.5px solid var(--b3);border-radius:var(--rm);overflow:hidden">';
+        h+='<div style="padding:6px 10px;font-weight:500;background:var(--bg2);border-bottom:0.5px solid var(--b3);font-size:12px">#</div>';
+        h+='<div style="padding:6px 10px;font-weight:500;background:var(--bg2);border-bottom:0.5px solid var(--b3);border-left:0.5px solid var(--b3);font-size:12px">Axes</div>';
+        h+='<div style="padding:6px 10px;font-weight:500;background:var(--bg2);border-bottom:0.5px solid var(--b3);border-left:0.5px solid var(--b3);font-size:12px">Dim.</div>';
+        h+='<div style="padding:6px 10px;font-weight:500;background:var(--bg2);border-bottom:0.5px solid var(--b3);border-left:0.5px solid var(--b3);font-size:12px"></div>';
+        suggestions.forEach((s,idx)=>{
+          const labels=s.axes.map(getAL).join(', ');
+          const bdr=idx<suggestions.length-1?'border-bottom:0.5px solid var(--b3);':'';
+          const df=s.dim%1,isF=df>.1&&df<.9;
+          const ds=isF?'font-weight:500;color:var(--ts);':'';
+          h+='<div style="padding:6px 10px;font-size:12px;'+bdr+'">'+(idx+1)+'</div>';
+          h+='<div style="padding:6px 10px;font-size:12px;border-left:0.5px solid var(--b3);'+bdr+'">'+labels+'</div>';
+          h+='<div style="padding:6px 10px;font-size:12px;border-left:0.5px solid var(--b3);'+bdr+ds+'">'+s.dim.toFixed(2)+'</div>';
+          h+='<div style="padding:6px 10px;border-left:0.5px solid var(--b3);'+bdr+'"><button onclick="applyAxes(\''+s.axes[0]+'\',\''+s.axes[1]+'\',\''+s.axes[2]+'\')" style="font-size:11px;padding:2px 8px">Set</button></div>';
+        });
+        h+='</div>';list.innerHTML=h;
+      }else{box.style.display='none'}
+    },50);
+  },50);
+});
+
+$('btn-run').click();
+</script>
+</body>
+</html>
